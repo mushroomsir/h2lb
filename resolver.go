@@ -13,7 +13,7 @@ type Resolver struct {
 	cache map[string][]string
 }
 
-// NewResolver ...
+// NewResolver refresh specifies the refresh interval of DNS cache.
 func NewResolver(refresh time.Duration) *Resolver {
 	resolver := &Resolver{
 		cache: make(map[string][]string, 0),
@@ -72,4 +72,26 @@ func (a *Resolver) Refresh() {
 		a.Lookup(addr)
 		time.Sleep(time.Second)
 	}
+}
+
+// Dialer ...
+type Dialer struct {
+	Resolver *Resolver
+	Dialer   *net.Dialer
+}
+
+// DialContext ...
+func (a *Dialer) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
+	host, port, err := net.SplitHostPort(address)
+	if err != nil {
+		return nil, err
+	}
+	ips, _ := a.Resolver.Get(host)
+	for _, ip := range ips {
+		conn, err := a.Dialer.DialContext(ctx, network, ip+":"+port)
+		if err == nil {
+			return conn, nil
+		}
+	}
+	return a.Dialer.DialContext(ctx, network, address)
 }

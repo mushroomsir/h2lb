@@ -15,6 +15,7 @@ type Transport struct {
 	*http2.Transport
 	HttpTransport     *http.Transport
 	lock              sync.Mutex
+	Resolver          *Resolver
 	pool              map[string]*http2.Transport // keys is host:port
 	transportPoolOnce sync.Once
 }
@@ -40,6 +41,13 @@ func (a *Transport) initTransport() {
 	if a.HttpTransport == nil {
 		a.HttpTransport = &http.Transport{}
 	}
+	if a.HttpTransport.DialContext == nil && a.Resolver != nil {
+		d := &Dialer{
+			Resolver: a.Resolver,
+			Dialer:   &net.Dialer{},
+		}
+		a.HttpTransport.DialContext = d.DialContext
+	}
 	if a.pool == nil {
 		a.pool = make(map[string]*http2.Transport)
 	}
@@ -47,7 +55,7 @@ func (a *Transport) initTransport() {
 
 // GetTransport ...
 func (a *Transport) GetTransport(req *http.Request) (*http2.Transport, error) {
-	addrs, err := net.LookupHost(req.Host)
+	addrs, err := a.getAddrs(req.Host)
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +80,13 @@ func (a *Transport) GetTransport(req *http.Request) (*http2.Transport, error) {
 		a.lock.Unlock()
 	}
 	return current, nil
+}
+
+func (a *Transport) getAddrs(host string) ([]string, error) {
+	if a.Resolver != nil {
+		return a.Resolver.Get(host)
+	}
+	return net.LookupHost(host)
 }
 
 func (a *Transport) clone() *http2.Transport {

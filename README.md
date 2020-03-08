@@ -7,6 +7,7 @@ HTTP/2 Load Balance
 ## Feature
 - HTTP/2 Load Balance
 - HTTP/1 compatibility 
+- Support DNS cache
 
 ## Licenses
 

@@ -1,6 +1,8 @@
 package h2lb
 
 import (
+	"context"
+	"net"
 	"testing"
 	"time"
 
@@ -17,4 +19,15 @@ func TestResolver(t *testing.T) {
 	require.True(len(ips) > 0)
 
 	require.Equal(ips, r.cache[key])
+}
+
+func TestDialContext(t *testing.T) {
+	require := require.New(t)
+	d := &Dialer{
+		Resolver: NewResolver(time.Minute),
+		Dialer:   &net.Dialer{},
+	}
+	conn, err := d.DialContext(context.Background(), "tcp", "github.com:80")
+	require.Nil(err)
+	require.NotNil(conn)
 }
