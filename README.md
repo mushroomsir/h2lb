@@ -1,5 +1,6 @@
 # h2lb
 [![Build Status](https://img.shields.io/travis/mushroomsir/h2lb.svg?style=flat-square)](https://travis-ci.org/mushroomsir/h2lb)
+[![Coverage Status](http://img.shields.io/coveralls/mushroomsir/h2lb.svg?style=flat-square)](https://coveralls.io/github/mushroomsir/h2lb?branch=master)
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://github.com/mushroomsir/h2lb/blob/master/LICENSE)
 
 HTTP/2 Load Balance

@@ -13,9 +13,10 @@ import (
 // Transport ...
 type Transport struct {
 	*http2.Transport
-	HttpTransport     *http.Transport
+	HttpTransport *http.Transport
+	Resolver      *Resolver
+
 	lock              sync.Mutex
-	Resolver          *Resolver
 	pool              map[string]*http2.Transport // keys is host:port
 	transportPoolOnce sync.Once
 }
